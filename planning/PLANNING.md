@@ -99,6 +99,28 @@ have fully conjoint domains which is not the case with RBO calculations.
 
 ### If any, which (parametrisable) probability distributions define the properties of rankings?
 
+#### Conjointness of the domains
+
+- Let $A$ and $B$ be the domains from which the rankings $S$ and $L$ are drawn
+  respectiveley
+- The user gives some chosen Jaccard Similarity value as input, as well as the
+  desired sizes of both domains $|A| = a$ and $|B| = b$
+- Jaccard Similarity is calculated as:
+  - $J(A, B) = \frac{|A \cap B|}{|A \cup B|}$
+  - $|A \cup B| = a + b - |A \cap B|$
+  - $J(A, B) (a + b - |A \cap B|) = |A \cap B|$
+  - $J(A, B) (a + b) - J(A, B)(|A \cap B|) = |A \cap B|$
+  - $J(A, B) (a + b) = J(A, B)(|A \cap B|) + |A \cap B|$
+  - $|A \cap B| = \frac{J(A, B) (a + b)}{1 + J(A, B)}$
+- From these derivations, we can find the size of the intersection. To ensure
+  that this is an integer, we use the floor of the last term as the size of
+  the intersection. Let this value be $p$.
+- We generate $p$ items and add them to both $A$ and $B$.
+- We then add $a - p$ uniquely labelled elements to $A$
+- Finally, we add $b - p$ uniquely labelled elements to $B$
+
+#### Top weightedness
+
 - Formalisms
 
   - Let the two domains be $A$ and $B$. The sizes of both sets are $a$ and $b$ respectively
@@ -115,7 +137,8 @@ have fully conjoint domains which is not the case with RBO calculations.
     where $n = \text{min}(a, b)$
   - if $\theta = 1$, the prob of agreement should follow some sort of bounded $\text{exp}(1)$ distribution
   - $\theta$ describes the degree of top-weightedness
-  - for a high value of $\theta$, we would like some sort of decaying function such that at earlier depths, the probability of agreement
+  - for a high value of $\theta$, we would like some sort of decaying function
+    such that at earlier depths, the probability of agreement
     is higher than at later depths. For a low value of $\theta$, we do not need
   - we have the general function: $f(x) = \theta (e^{-\frac{x}{k}}) + (1 - \theta)(\frac{1}{n})$
     - $\theta$ : top-weightedness
@@ -123,48 +146,29 @@ have fully conjoint domains which is not the case with RBO calculations.
       decaying is scaled to the size of the domain. For example, we can say that
       for $\theta = 1$, we want the probability of increasing overlap to be greater
       than completely random for the first 30% of items ranked. Then:
-        - $e^{\frac{-0.3n}{k}} = \frac{1}{n}$
-        - solving for $k$, we find that $k = \frac{0.3n}{ln(n)}$
+      - $e^{\frac{-0.3n}{k}} = \frac{1}{n}$
+      - solving for $k$, we find that $k = \frac{0.3n}{ln(n)}$
 
-- Presence of tie-groups?
+#### Ties
+
 - Relationship between location of tie groups and depth?
   - are there more ties the deeper you are?
-- is there a relationship between the previous element being part of a tie group or not?
-  - i.e. let $T_i \in \{0, 1\}$ signify that the $i^\text{th}$ element is part of a tie group
+- is there a relationship between the previous element being part of a tie group
+  or not?
+
+  - i.e. let $T_i \in \{0, 1\}$ signify that the $i^\text{th}$ element is part
+    of a tie group
   - is $P(t_i = 1 | t_{i-1} = 1)$ different to $P(t_i = 1)$
-- how can we use the input Kendall's $\tau$ to tailor the generate rankings' degree of conjointness?
-- different prefix lengths? (not relevant for now)
-- parametrise it to introduce top-weightedness? (agreements at the top)
-- Once we have finished creating the new ranking generation algorithm, we can
-  use various statistical tests such as the Kolmogorov-Smirnov Test to check if
-  the distributions are the same
+
+- Input:
+  - `frac_ties_x`, `frac_ties_y`
+  - `num_groups_x`, `num_groups_y`
 
 ## Final Algorithm
 
 ### Pseudocode
 
-```R
-simulate_scores <- function(n, tau, frac_ties_x, frac_ties_y, n_groups_x, n_groups_y, top_weightendess_factor = ...) {
-    # top_weightedness_factor : the proportion of agreements in the first x ranks?
-    n_ties_x, n_ties_y <- validate_tie_lengths(...)
-    x <- vector()
-    y <- vector()
-    repeat {
-        if (length(x) == n && length(y) == n) {
-            break
-        }
-       a, b <- generate_couple(tau) # uses tau to influence the covariance matrix
-
-       tie_length_x <- sample_tie_distribution(...) # if `frac_ties_x` is small, then this should usually be 1 to show that the 'tie length' is 1
-
-
-        tie_length_y <- sample_tie_distrubtion(...) # if `frac_ties_y` is small, then this should usually be 1 to show that the 'tie length' is 1
-
-        # add `tie_length_x` instances of a to x and `tie_length_y` instances of b to y
-    }
-}
-
-```
+(TODO)
 
 ## Essay Plan
 
