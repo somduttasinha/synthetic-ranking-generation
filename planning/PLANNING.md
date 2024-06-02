@@ -32,7 +32,7 @@
 ### How is RBO calculated?
 
 The original text [1] gives formulae to calculate the monotonically increasing
-RBO$^\text{min}$, monotonically RBO$^\text{max}$ and the extrapolated estimate RBO$^\text{ext}$
+RBO$^\text{min}$, monotonically decreasing RBO$^\text{max}$ and the extrapolated estimate RBO$^\text{ext}$
 
 #### RBO$^w$
 
@@ -156,13 +156,20 @@ have fully conjoint domains which is not the case with RBO calculations.
 - is there a relationship between the previous element being part of a tie group
   or not?
 
-  - i.e. let $T_i \in \{0, 1\}$ signify that the $i^\text{th}$ element is part
-    of a tie group
-  - is $P(t_i = 1 | t_{i-1} = 1)$ different to $P(t_i = 1)$
-
 - Input:
+
   - `frac_ties_x`, `frac_ties_y`
   - `num_groups_x`, `num_groups_y`
+
+- we generate a probabilities vector which sums to 1. We then select `n_groups`
+  starting indices in accordance with the probabilities. This probabilities
+  vector allows the user to define the distribution of tie groups.
+
+- the size of the tie group is determined by a Poisson distribution:
+  $X \sim \text{Poisson}(a)$. Where $a$ is the average tie group size
+
+- IDEA: to demonstrate this on large lists, colour the tie groups and zoom out
+  a lot, this way, people can see the distribution of ties visually.
 
 ## Final Algorithm
 
@@ -173,7 +180,10 @@ have fully conjoint domains which is not the case with RBO calculations.
 ## Essay Plan
 
 - Abstract
+  - past tense
 - Introduction
+  - with reference to existing literature, tell the reader what we know and
+    what we do not yet know. Identify the research gap. Introduce RQ
   - Broad statement regarding the importance of ranking systems in general in
     various applications
     - Ranking systems are ubiquitous across several domains, ranging from
@@ -201,7 +211,9 @@ have fully conjoint domains which is not the case with RBO calculations.
         generation" on various literature search engines yield very
         few results thus demonstrating that my contribution is
         necessary
-  - objective of the study
+  - objective of the research
+    - introduce a synthetic ranking generation algorithm where properties of
+      the rankings can be tuned as per the researchers requirements
   - significance of the study
   - outline of the paper
 - Background/Related Work
@@ -211,11 +223,65 @@ have fully conjoint domains which is not the case with RBO calculations.
     - remark that there is little to no literature on simulated ranking data
     - most literature focuses on generating synthetic data for ML models
 - Methodology
-  - ranking encoding. We need to represent ties in rankngs in an intuitive manner.
-    Maybe we have a section exploring different options
+  - identified the three 'tunable' aspects of rankings
+  - used jupyter notebook to prototype ideas
+  - degree of conjointness - Jaccard similarity
+- the algorithm (my contribution)
+  - we repeatedly sample items from the domains without replacement. We then
+    introduce ties following the user's desired parameters
 - Experimental set-up
 - Results
+
+  - give concrete evidence that each of the three aspects of rankings is addressed
+    - conjointness
+    - overlap
+    - ties
+  - for each figure presented, show the function call used.
+    - e.g. `simulate_rankings(..., probabilties_ties_x=gaussian(...))`
+  - conjointness
+    - vary the desired `jaccard_similarity` and show that the generated domains
+      are similar/different in some visual format
+  - overlap:
+    - show that using
+  - vary tie distribution
+
+    - presentation format: a table like this:
+
+      | $d$      | number of tied items |
+      | -------- | -------------------- |
+      | 1-100    | 5                    |
+      | ...      | $x$                  |
+      | 901-1000 | 45                   |
+
+  - vary the overlap probability function and show the table with the case
+    column
+
+    - gaussian with low variance
+    - gaussian with high variance
+    - increasing
+    - decaying (prioritise agreements at eariler depths)
+      - show $\text{RBO}_\text{ext}$ table
+
+    | $\theta$ | RBO |
+    | -------- | --- |
+    | 0        | a   |
+    | 0.2      | b   |
+    | 0.4      | c   |
+    | 0.6      | d   |
+    | 0.8      | e   |
+    | 1.0      | f   |
+
 - Discussion
+
+  - discuss limitations of the current method
+
+    - the number of tied elements is currently an expectation. i.e. we expect
+      that on average, `frac_ties * n` will be tied. However we cannot
+      guarantee that this will happen every time.
+    - the location of tie groups is determined by the user-provided tie group
+      distribution. If it is weighted towards the end, but the user wants a large
+      proportion of tied items, it might not work because we may not 'have enough'
+      items to tie.
 
   - perhaps we can show that measures such as Kendall's $\tau$ do not perform as
     well as RBO on my synthetic data set because it does not prioritise
@@ -223,31 +289,43 @@ have fully conjoint domains which is not the case with RBO calculations.
   - e.g. we can do something like
 
   ```R
-  rankings <- simulate_rankings(conjoint=TRUE, top_weighted = TRUE) # top_weighted parameter focusses agreements toward the top of the rankings
+  rankings <- simulate_rankings(conjoint=TRUE, top_weighted = TRUE)
+  #top_weighted parameter focusses agreements toward the top of the rankings
   tau_score <- kendalltau(rankings)
   rbo_score <- rbo(rankings)
   ```
 
-  somehow show that the `rbo_score` reflects better. e.g. relative to some pre-defined baseline RBO score, it is much higher than `tau_score` is to
-  its pre-defined baseline. This will show that generating synthetic rankings that is tailored to RBO properties is good.
+  somehow show that the `rbo_score` reflects better. e.g. relative to some
+  pre-defined baseline RBO score, it is much higher than `tau_score` is to its
+  pre-defined baseline. This will show that generating synthetic rankings that
+  is tailored to RBO properties is good.
 
 - Conclusion and Future Work
+  - state answer to the research question
+  - state any recommendations based on research findings.
+  - improvements:
+    - some sort of dependence structure between ties?
 
 ## References
 
 - [1] Webber 2010, "A Similarity Measure for Indefinite Rankings"
 - [2] Corsi and Urbano 2024, "The Treatment of Ties in Rank-Biased Overlap"
 - [3] Corsi and Urbano 2024, [GitHub repository](https://github.com/julian-urbano/sigir2024-rbo)
-- [4] Sarrica, Quattrone, Quattrone 2022, "Introducing the Rank-Biased Overlap as Similarity Measure for Feature Importance in Explainable Machine Learning:
+- [4] Sarrica, Quattrone, Quattrone 2022, "Introducing the Rank-Biased Overlap
+  as Similarity Measure for Feature Importance in Explainable Machine Learning:
   A Case Study on Parkinson’s Disease""
-- [5] Jordon, Yoon, Van der Schaar 2018 "Measuring the quality of Synthetic data for use in competitions"
-- [6] Figueira and Vaz 2022, "Survey on Synthetic Data Generation, Evaluation Methods and GANs"
-  - "it must be plausible and follow the underlying distribution of the original data" (pg 1)
+- [5] Jordon, Yoon, Van der Schaar 2018 "Measuring the quality of Synthetic data
+  for use in competitions"
+- [6] Figueira and Vaz 2022, "Survey on Synthetic Data Generation, Evaluation
+  Methods and GANs"
+  - "it must be plausible and follow the underlying distribution of the original
+    data" (pg 1)
     - in this case, the "original data" is the data generated by the existing simulation
   - "Generative Adversarial Models"
   - Evaluation of the quality of synthetic data
-    - "One may want to generate synthetic data to improve the performance of a machine learning (ML) model, while others may need synthetic data with novel patterns
-      without worrying too much about the performance of the model"
+    - "One may want to generate synthetic data to improve the performance of a
+      machine learning (ML) model, while others may need synthetic data with novel
+      patterns without worrying too much about the performance of the model"
     - Section 5
 - [7] Rafique, Awan, Shafiq, Mahmood, 2023, "Exploring the role of ranking
   systems towards university performance improvement: A focus group-based study"
