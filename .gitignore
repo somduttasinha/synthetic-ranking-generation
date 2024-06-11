@@ -1,1 +1,2 @@
-exploratory/.ipynb_checkpoints/
+*.png
+exploratory/.ipynb_checkpoints/*
