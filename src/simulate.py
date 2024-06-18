@@ -16,7 +16,7 @@ def jaccard_similarity(set1, set2):
     return len(intersection) / len(union)
 
 
-def generate_domains(n, jac_value):
+def generate_domains(a, b, jaccard_similarity):
     """
     Generate two sets of size n that have a Jaccard similarity of jac_value.
 
@@ -24,7 +24,7 @@ def generate_domains(n, jac_value):
     jac_value: Jaccard similarity between the two sets
     """
 
-    intersection_size = math.floor((jac_value * (2 * n)) / (1 + jac_value))
+    intersection_size = math.floor((jaccard_similarity * (a + b)) / (1 + jaccard_similarity))
 
     set_a = set()
     set_b = set()
@@ -34,10 +34,13 @@ def generate_domains(n, jac_value):
         set_a.add(item_label)
         set_b.add(item_label)
 
-    rem = n - intersection_size
+    a_rem = a - intersection_size
+    b_rem = b - intersection_size
 
-    for i in range(rem):
+    for i in range(a_rem):
         set_a.add("a" + str(i))
+
+    for i in range(b_rem):
         set_b.add("b" + str(i))
 
     return set_a, set_b
@@ -45,7 +48,7 @@ def generate_domains(n, jac_value):
 
 def _ensure_two_separation(xs, n):
     """
-    Ensure that the elements in xs are at least 2 apart. This is to ensure that the tied groups have at least 2 elements in them.
+    Ensure that the elements in xs are at least 2 apart. This is done so that the tied groups have at least 2 elements in them.
 
     xs: list containing the tied items start indices
     n: number of elements in the domain
@@ -81,17 +84,17 @@ def add_ties(X, frac_ties, num_groups, probabilities):
     if frac_ties == 0:
         return X
 
-    assert num_groups <= len(X) / 2
-    assert len(probabilities) == len(X)
+    n = len(X)
 
-    indices = np.arange(0, len(X))
+    assert num_groups <= n / 2
+    assert len(probabilities) == n
+
+    indices = np.arange(0, n)
 
     selected_start_indices = np.random.choice(
         indices, size=num_groups, replace=False, p=probabilities
     )
-    selected_start_indices = _ensure_two_separation(selected_start_indices, len(X))
-
-    n = len(X)
+    selected_start_indices = _ensure_two_separation(selected_start_indices, n)
 
     X_with_ties = []
 
@@ -127,7 +130,8 @@ def add_ties(X, frac_ties, num_groups, probabilities):
 
 
 def simulate_rankings(
-    n,
+    a,
+    b,
     len_x,
     len_y,
     overlap_probability_function,
@@ -157,8 +161,13 @@ def simulate_rankings(
     return_truncated: whether to return truncated rankings
     """
 
+    assert a >= len_x
+    assert b >= len_y
+
     # generate the two domains depending on the degree of conjointness
-    a, b = generate_domains(n, conjointness)
+    A, B = generate_domains(a, b, conjointness)
+
+    n = a if a < b else b
 
     S = []
     L = []
@@ -192,16 +201,16 @@ def simulate_rankings(
             decision = random.sample(cases, 1)[0]
 
             if decision == 1:
-                item_S_domain = a.intersection(set(L))
-                item_L_domain = b
+                item_S_domain = A.intersection(set(L))
+                item_L_domain = B
 
             elif decision == 2:
-                item_S_domain = a
-                item_L_domain = b.intersection(set(S))
+                item_S_domain = A
+                item_L_domain = B.intersection(set(S))
 
             elif decision == 3:
-                item_S_domain = a.intersection(b)
-                item_L_domain = a.intersection(b)
+                item_S_domain = A.intersection(B)
+                item_L_domain = A.intersection(B)
 
                 # already draw item for S and L to make sure they are the same
 
@@ -210,29 +219,29 @@ def simulate_rankings(
                     item_L = item_S
 
             elif decision == 4:
-                item_S_domain = a.intersection(set(L))
-                item_L_domain = b.intersection(set(S))
+                item_S_domain = A.intersection(set(L))
+                item_L_domain = B.intersection(set(S))
 
             else:
                 raise Exception("Invalid decision")
 
         else:
-            item_S_domain = a
-            item_L_domain = b
+            item_S_domain = A
+            item_L_domain = B
             decision = 0
 
         if item_S is None:
             if len(item_S_domain) > 0:
                 item_S = random.sample(sorted(item_S_domain), 1)[0]
             else:
-                item_S = random.sample(sorted(a), 1)[0]
+                item_S = random.sample(sorted(A), 1)[0]
                 decision = 0
 
         if item_L is None:
             if len(item_L_domain) > 0:
                 item_L = random.sample(sorted(item_L_domain), 1)[0]
             else:
-                item_L = random.sample(sorted(b), 1)[0]
+                item_L = random.sample(sorted(B), 1)[0]
                 decision = 0
 
         case_list.append(decision)
@@ -240,8 +249,20 @@ def simulate_rankings(
         S.append(item_S)
         L.append(item_L)
 
-        a.remove(item_S)
-        b.remove(item_L)
+        A.remove(item_S)
+        B.remove(item_L)
+
+    # randomly sample the rest of the items from the remaining domain
+
+    for _ in range(n, a):
+        item_S = random.sample(sorted(A), 1)[0]
+        S.append(item_S)
+        A.remove(item_S)
+
+    for _ in range(n, b):
+        item_L = random.sample(sorted(B), 1)[0]
+        L.append(item_L)
+        B.remove(item_L)
 
     S_with_ties = add_ties(
         S, frac_ties_x, n_groups_x, probabilities=tie_probabilities_x
@@ -254,8 +275,8 @@ def simulate_rankings(
         return (
             S_with_ties[:len_x],
             L_with_ties[:len_y],
-            overlap_probs[:len_x],
-            case_list[:len_x],
+            overlap_probs[:min(len_x, len_y)],
+            case_list[:min(len_x, len_y)]
         )
 
     return S_with_ties, L_with_ties, overlap_probs, case_list
