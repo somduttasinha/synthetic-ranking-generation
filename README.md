@@ -8,3 +8,15 @@ upon the existing [version](https://github.com/julian-urbano/sigir2024-rbo/blob/
 - `exploratory/`: exploration scripts, this directory mainly contains Jupyter 
 Notebook files.
 
+To cite this package, use the folowing:
+
+```LaTex
+@mastersthesis{sinha2024syntheticrankings,
+    author = {Somdutta Sinha},
+    title = {Adaptive Synthetic Ranking Generation of Indefinite Rankings},
+    school = {Delft University of Technology},
+    year = {2024},
+    type = {Bachelor's Thesis},
+    url = {TBC}
+}
+```
