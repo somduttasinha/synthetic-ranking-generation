@@ -20,8 +20,9 @@ def generate_domains(a, b, jaccard_similarity):
     """
     Generate two sets of size n that have a Jaccard similarity of jac_value.
 
-    n: size of the sets
-    jac_value: Jaccard similarity between the two sets
+    a: size of set A
+    b: size of set B
+    jaccard_similarity: Jaccard similarity between the two sets
     """
 
     intersection_size = math.floor((jaccard_similarity * (a + b)) / (1 + jaccard_similarity))
@@ -147,7 +148,8 @@ def simulate_rankings(
     """
     Simulate rankings of two sets of items.
 
-    n: number of items to be ranked
+    a: number of items in first ranking's domain
+    b: number of items in second ranking's domain
     len_x: truncation length of the first ranking
     len_y: truncation length of the second ranking
     overlap_probability_function: function that determines the probability of increasing overlap between the two rankings at a given depth
@@ -158,7 +160,7 @@ def simulate_rankings(
     frac_ties_y: fraction of items that should be tied in the second ranking
     n_groups_y: number of tie groups in the second ranking
     conjointness: degree of conjointness between the two rankings
-    return_truncated: whether to return truncated rankings
+    truncate_rankings: whether to return truncated rankings
     """
 
     assert a >= len_x
