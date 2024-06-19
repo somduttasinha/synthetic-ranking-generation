@@ -1,0 +1,3 @@
+[submodule "sigir2024-rbo"]
+	path = sigir2024-rbo
+	url = https://github.com/julian-urbano/sigir2024-rbo.git
