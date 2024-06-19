@@ -2,6 +2,12 @@ import numpy as np
 from scipy.stats import binom, norm
 
 
+def zero():
+    def f(depth, n):
+        return 0
+
+    return f
+
 def exponential_decay(theta):
     # theta determines the level of top-weightedness.
     def f(depth, n):

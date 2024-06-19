@@ -2,6 +2,8 @@ import math
 import numpy as np
 import random
 
+from standard_functions import zero
+
 
 def jaccard_similarity(set1, set2):
     """
@@ -135,7 +137,7 @@ def simulate_rankings(
     b,
     len_x,
     len_y,
-    overlap_probability_function,
+    overlap_probability_function=zero(),
     tie_probabilities_x=None,
     tie_probabilities_y=None,
     frac_ties_x=0,
