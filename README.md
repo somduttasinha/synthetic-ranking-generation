@@ -8,7 +8,7 @@ upon the existing [version](https://github.com/julian-urbano/sigir2024-rbo/blob/
 - `exploratory/`: exploration scripts, this directory mainly contains Jupyter 
 Notebook files.
 
-To cite this package, use the folowing:
+To cite this repository, use the folowing:
 
 ```LaTex
 @mastersthesis{sinha2024syntheticrankings,
