@@ -112,14 +112,14 @@ def add_ties(X, frac_ties, num_groups, probabilities):
         if i in selected_start_indices:
             tie_group_length = np.random.poisson(average_group_size - 2) + 2
 
-            tie_group = [X[i]]
+            tie_group = {X[i]}
 
             for j in range(1, tie_group_length):
                 if (i + j) in selected_start_indices:
                     i -= 1
                     break
                 if i + j < n:
-                    tie_group.append(X[i + j])
+                    tie_group.add(X[i + j])
 
             X_with_ties.append(tie_group)
             i += j + 1
