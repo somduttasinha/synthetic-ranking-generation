@@ -47,7 +47,7 @@ S, L, overlap_probabilities, case_list = simulate_rankings(a, b, len_x, len_y, o
    created.
 
 ```Python
-S, L, agree_probs, case_list = simulate_rankings(a=30, b=50,
+S, L, overlap_probabilities, case_list = simulate_rankings(a=30, b=50,
                                                 len_x = 15, len_y = 15,
                                                 overlap_probability_function=exponential_decay(theta=1),
                                                 conjointness=0.4,
@@ -64,7 +64,7 @@ S, L, agree_probs, case_list = simulate_rankings(a=30, b=50,
    provided. The generated rankings are completely random.
 
 ```Python
-S, L, agree_probs, case_list = simulate_rankings(a=50, b=50,
+S, L, overlap_probabilities, case_list = simulate_rankings(a=50, b=50,
                                                 len_x = 15, len_y = 15, 
                                                 overlap_probability_function=zero(),
                                                 conjointness=1,
@@ -76,7 +76,7 @@ S, L, agree_probs, case_list = simulate_rankings(a=50, b=50,
 3. Rankings from fully conjoint domains with uniform tie distributions
 
 ```Python
-S, L, agree_probs, case_list = simulate_rankings(a=10, b=10, len_x = 0, len_y = 0,
+S, L, overlap_probabilities, case_list = simulate_rankings(a=10, b=10, len_x = 0, len_y = 0,
                                                  conjointness=1,
                                                  frac_ties_x=0.6,
                                                  n_groups_x=2,
