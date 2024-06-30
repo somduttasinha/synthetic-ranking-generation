@@ -16,7 +16,8 @@ is introduced, improving on the
 [existing algorithm](https://github.com/julian-urbano/sigir2024-rbo)
 implemented by Matteo Corsi and Julián Urbano. This new algorithm allows the
 user to tune several aspects of the ranking such as the conjointness of ranking
-domains and distribution of ties.
+domains and distribution of ties. The accompanying paper can be found on the
+[TU Delft Education Repository](http://resolver.tudelft.nl/uuid:5894293f-02e2-48e5-8461-a07b75ad35c7)
 
 ## Structure
 
@@ -99,6 +100,6 @@ To cite this repository, use the folowing:
     school = {Delft University of Technology},
     year = {2024},
     type = {Bachelor's Thesis},
-    url = {TBC}
+    url = {http://resolver.tudelft.nl/uuid:5894293f-02e2-48e5-8461-a07b75ad35c7}
 }
 ```
