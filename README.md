@@ -17,7 +17,7 @@ is introduced, improving on the
 implemented by Matteo Corsi and Julián Urbano. This new algorithm allows the
 user to tune several aspects of the ranking such as the conjointness of ranking
 domains and distribution of ties. The accompanying paper can be found on the
-[TU Delft Education Repository](http://resolver.tudelft.nl/uuid:5894293f-02e2-48e5-8461-a07b75ad35c7)
+[TU Delft Education Repository](http://resolver.tudelft.nl/uuid:5894293f-02e2-48e5-8461-a07b75ad35c7).
 
 ## Structure
 
